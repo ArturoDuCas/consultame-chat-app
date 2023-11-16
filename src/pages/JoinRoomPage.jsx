@@ -1,20 +1,43 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import { toast } from "react-toastify";
 import {useNavigate} from "react-router-dom";
+import { useWebSocket } from "../context/WebSocketContext.jsx";
 
 export default function JoinRoomPage() {
   const [roomCode, setRoomCode] = useState("");
   const navigate = useNavigate();
+  const socket = useWebSocket();
 
-  function handleJoinRoom() {
+  useEffect(() => {
+    if (!socket) {
+      return;
+    }
+
+    if(localStorage.getItem("token")) {
+      navigate("/chat");
+      return;
+    }
+
+  }, [socket]);
+
+
+  function handleJoinRoom(event) {
+    event.preventDefault();
     if (roomCode.trim() === "") {
       toast.error("El código de la sesión no puede estar vacío");
       return;
     }
 
-
-    toast.dismiss();
-    navigate(`/chat`);
+    socket.emit("Room Connection Verification", roomCode, (response) => {
+      if(response.success) {
+        localStorage.setItem("token", response.token);
+        toast.dismiss();
+        toast.success(response.message)
+        navigate(`/chat`);
+      } else {
+        toast.error(response.message);
+      }
+    });
   }
   return(
     <div className="w-full h-screen flex">
@@ -38,19 +61,22 @@ export default function JoinRoomPage() {
         >
           Ingresa el código de la sesión que se muestra dentro de la aplicación Consultame
         </p>
-        <input
-          type="text"
-          placeholder="Type here"
-         className="input input-bordered w-full max-w-xs mb-2"
-          value={roomCode}
-          onChange={(e) => setRoomCode(e.target.value)}
-        />
-        <button
-          className="btn btn-primary w-full max-w-xs"
-          onClick={handleJoinRoom}
-        >
-          Ingresar
-        </button>
+        <form>
+          <input
+            type="text"
+            placeholder="Type here"
+           className="input input-bordered w-full max-w-xs mb-2"
+            value={roomCode}
+            onChange={(e) => setRoomCode(e.target.value)}
+          />
+          <button
+            className="btn btn-primary w-full max-w-xs"
+            onClick={(e) => handleJoinRoom(e)}
+          >
+            Ingresar
+          </button>
+        </form>
+
       </div>
 
     </div>
