@@ -10,8 +10,8 @@ export const WebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     const newSocket = io(
-                                  'http://localhost:3000'
-                                   // 'https://consultame-api.onrender.com'
+                                  // 'http://localhost:3000'
+                                   'https://consultame-api.onrender.com'
                                 );
     setSocket(newSocket);
 

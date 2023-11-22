@@ -5,6 +5,7 @@ import { useWebSocket } from "../context/WebSocketContext.jsx";
 
 export default function JoinRoomPage() {
   const [roomCode, setRoomCode] = useState("");
+  const [confirmation, setConfirmation] = useState(null);
   const navigate = useNavigate();
   const socket = useWebSocket();
 
@@ -20,6 +21,21 @@ export default function JoinRoomPage() {
 
   }, [socket]);
 
+  useEffect(() => {
+    if(!socket) {
+      return;
+    }
+    if(confirmation == null) {
+      return;
+    }
+
+    socket.emit("Save Messages Confirmation", { confirmation, roomKey: roomCode });
+    navigate(`/chat`);
+
+
+  }, [confirmation]);
+
+
 
   function handleJoinRoom(event) {
     event.preventDefault();
@@ -28,12 +44,19 @@ export default function JoinRoomPage() {
       return;
     }
 
+    if(!socket.connected) {
+      toast.dismiss();
+      toast.error("No se pudo conectar con el servidor");
+      return;
+    }
+
     socket.emit("Room Connection Verification", roomCode, (response) => {
       if(response.success) {
-        localStorage.setItem("token", response.token);
+        document.getElementById('save-conversation-modal').showModal();
         toast.dismiss();
         toast.success(response.message)
-        navigate(`/chat`);
+
+        localStorage.setItem("token", response.token);
       } else {
         toast.error(response.message);
       }
@@ -41,12 +64,37 @@ export default function JoinRoomPage() {
   }
   return(
     <div className="w-full h-screen flex">
-      <div className="w-1/2">
-        <img
-          src="/join-room.png"
-          alt="Join Room"
-          className="object-cover w-full h-full rounded-r-md"
-        />
+      <dialog id="save-conversation-modal" className="modal">
+        <div className="modal-box">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+          <h3 className="font-bold text-lg">¡Hola!</h3>
+          <p className="py-4">¿Confirmas tu autorización para que la conversación se guarde y el paciente pueda acceder a ella posterior a la consulta?</p>
+          <div className="flex flex-row justify-end gap-3">
+            <button
+              className="btn btn-primary"
+              onClick={() => setConfirmation(true)}
+            >
+              Confirmo
+            </button>
+            <button
+              className="btn btn-outline btn-primary"
+              onClick={() => setConfirmation(false)}
+            >
+              No Confirmo
+            </button>
+          </div>
+
+        </div>
+      </dialog>
+
+      <div className="w-1/2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 rounded-r shadow-2xl">
+        {/*<img*/}
+        {/*  src="/join-room.png"*/}
+        {/*  alt="Join Room"*/}
+        {/*  className="object-cover w-full h-full rounded-r-md"*/}
+        {/*/>*/}
       </div>
       <div className="flex flex-col items-center w-1/2 my-24">
         <ul className="steps steps-horizontal mb-10">
@@ -72,6 +120,7 @@ export default function JoinRoomPage() {
           <button
             className="btn btn-primary w-full max-w-xs"
             onClick={(e) => handleJoinRoom(e)}
+            // onClick={(e) => handleJoinRoom(e)}
           >
             Ingresar
           </button>
