@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import {toast} from "react-toastify";
 
 export default function Header({finished, setFinished}) {
+
   const navigate = useNavigate();
 
 
@@ -18,6 +19,7 @@ export default function Header({finished, setFinished}) {
         </h3>
       </div>
 
+
       <div className="w-1/3 flex justify-center">
       {!finished && (
         <ul className="steps steps-horizontal">
@@ -31,7 +33,8 @@ export default function Header({finished, setFinished}) {
       )}
       </div>
 
-      <div className="w-1/3 flex justify-end">
+      <div className="w-1/3 flex justify-end gap-4">
+
         <button
           className="btn btn-secondary"
           onClick={() => {
@@ -40,7 +43,9 @@ export default function Header({finished, setFinished}) {
             navigate("/");
 
           }}
-        >Exit</button>
+        >
+          Exit
+        </button>
       </div>
 
     </div>

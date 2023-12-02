@@ -9,7 +9,7 @@ function App() {
       <WebSocketProvider>
         <Routes>
           <Route index element={<JoinRoomPage />}/>
-          <Route path="/chat" element={<ChatPage/>} />
+          <Route  path="/chat" element={<ChatPage/>} />
         </Routes>
       </WebSocketProvider>
   )

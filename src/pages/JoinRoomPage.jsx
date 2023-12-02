@@ -9,7 +9,10 @@ export default function JoinRoomPage() {
   const navigate = useNavigate();
   const socket = useWebSocket();
 
+
   useEffect(() => {
+    // navigate("/chat")
+
     if (!socket) {
       return;
     }
@@ -19,6 +22,9 @@ export default function JoinRoomPage() {
       return;
     }
 
+    return () => {
+      socket.off("Send Consultation Data");
+    }
   }, [socket]);
 
   useEffect(() => {
@@ -62,6 +68,8 @@ export default function JoinRoomPage() {
       }
     });
   }
+
+
   return(
     <div className="w-full h-screen flex">
       <dialog id="save-conversation-modal" className="modal">
@@ -90,11 +98,11 @@ export default function JoinRoomPage() {
       </dialog>
 
       <div className="w-1/2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 rounded-r shadow-2xl">
-        {/*<img*/}
-        {/*  src="/join-room.png"*/}
-        {/*  alt="Join Room"*/}
-        {/*  className="object-cover w-full h-full rounded-r-md"*/}
-        {/*/>*/}
+        <img
+          src="/background.svg"
+          alt="Join Room"
+          className="object-cover w-full h-full rounded-r-md"
+        />
       </div>
       <div className="flex flex-col items-center w-1/2 my-24">
         <ul className="steps steps-horizontal mb-10">
